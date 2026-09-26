@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f7f4">
+  <title>Centre d'informations</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Georgia, "Times New Roman", serif;
+      color: #183b38;
+      background: #f3f7f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background-image: repeating-linear-gradient(
+        135deg,
+        transparent 0,
+        transparent 31px,
+        rgb(24 59 56 / 2%) 32px,
+        transparent 33px
+      );
+    }
+
+    header {
+      position: relative;
+      display: grid;
+      min-height: 116px;
+      place-items: center;
+      padding: 28px 20px;
+      border-bottom: 1px solid #c6d7d0;
+      background: rgb(255 255 255 / 72%);
+    }
+
+    header::before {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 5px;
+      background: #167c70;
+      content: "";
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1.2;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    main {
+      display: grid;
+      min-height: calc(100vh - 210px);
+      padding: 32px 20px;
+      text-align: center;
+    }
+
+    main[hidden] {
+      display: none;
+    }
+
+    #home-view {
+      grid-template-rows: auto 1fr;
+      align-items: start;
+      justify-items: stretch;
+      place-items: initial;
+      text-align: left;
+    }
+
+    #home-view h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .intro-copy {
+      max-width: 72ch;
+      line-height: 1.65;
+    }
+
+    .intro-copy p {
+      margin: 16px 0 0;
+    }
+
+    #home-view .action-button {
+      align-self: center;
+      justify-self: center;
+    }
+
+    .action-button {
+      min-width: 128px;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 4px;
+      background: #167c70;
+      color: #fff;
+      font: inherit;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    .action-button:hover {
+      background: #105f56;
+    }
+
+    .action-button:focus-visible {
+      outline: 3px solid #e39b50;
+      outline-offset: 3px;
+    }
+
+    .admin-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      padding: 16px;
+      border: 0;
+      background: transparent;
+      color: #183b38;
+      font: inherit;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    .admin-link:hover {
+      color: #167c70;
+    }
+
+    .admin-link:focus-visible {
+      outline: 3px solid #e39b50;
+      outline-offset: 3px;
+    }
+
+    .lock-icon {
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .site-footer {
+      display: grid;
+      min-height: 94px;
+      place-items: center;
+      padding: 8px 20px;
+      border-top: 1px solid #c6d7d0;
+      background: rgb(255 255 255 / 78%);
+    }
+
+    #site-footer[hidden],
+    #admin-view[hidden] {
+      display: none;
+    }
+
+    .site-footer .admin-link {
+      gap: 4px;
+      margin-bottom: 0;
+      padding: 8px 16px;
+    }
+
+    .admin-form {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+      margin-bottom: 24px;
+    }
+
+    .admin-form[hidden] {
+      display: none;
+    }
+
+    .admin-form input {
+      width: 100%;
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid #9bb8ae;
+      border-radius: 4px 0 0 4px;
+      background: #fff;
+      color: #183b38;
+      font: inherit;
+      font-size: 16px;
+    }
+
+    .password-field {
+      display: flex;
+      width: min(320px, 100%);
+    }
+
+    .visibility-toggle {
+      display: grid;
+      width: 46px;
+      flex: 0 0 46px;
+      place-items: center;
+      border: 1px solid #9bb8ae;
+      border-left: 0;
+      border-radius: 0 4px 4px 0;
+      background: #fff;
+      color: #183b38;
+      cursor: pointer;
+    }
+
+    .visibility-toggle:hover {
+      color: #167c70;
+    }
+
+    .visibility-toggle:focus-visible {
+      z-index: 1;
+      outline: 3px solid #e39b50;
+      outline-offset: 2px;
+    }
+
+    .visibility-toggle svg {
+      width: 20px;
+      height: 20px;
+      transform: translateX(3px);
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .visibility-toggle .eye-slash {
+      display: none;
+    }
+
+    .visibility-toggle[aria-pressed="true"] .eye-slash {
+      display: initial;
+    }
+
+    .admin-form input:focus-visible {
+      outline: none;
+    }
+
+    .admin-form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .action-button.secondary {
+      border: 1px solid #167c70;
+      background: transparent;
+      color: #167c70;
+    }
+
+    .action-button.secondary:hover {
+      background: #e3efea;
+    }
+
+    #admin-error {
+      margin: 0;
+      color: #a2342b;
+    }
+
+    #admin-view {
+      display: block;
+      text-align: left;
+    }
+
+    .admin-dashboard {
+      width: min(100%, 900px);
+      margin: 0 auto;
+    }
+
+    .admin-dashboard[hidden],
+    .admin-detail[hidden] {
+      display: none;
+    }
+
+    .admin-dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .admin-dashboard-header h2,
+    .admin-detail h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .admin-page-button {
+      display: grid;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid #c6d7d0;
+      border-radius: 4px;
+      background: rgb(255 255 255 / 82%);
+      color: #167c70;
+      font: inherit;
+      font-size: 38px;
+      cursor: pointer;
+    }
+
+    .admin-page-button.has-name {
+      padding: 8px;
+      font-size: 14px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .admin-page-button:hover {
+      border-color: #167c70;
+      background: #e3efea;
+    }
+
+    .admin-detail {
+      position: relative;
+      min-height: 62vh;
+      padding: 20px 64px 24px 24px;
+      border: 1px solid #c6d7d0;
+      border-radius: 4px;
+      background: rgb(255 255 255 / 88%);
+    }
+
+    .admin-detail-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: grid;
+      width: 40px;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: #183b38;
+      font: inherit;
+      font-size: 30px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .admin-detail-close:hover {
+      background: #e3efea;
+      color: #167c70;
+    }
+
+    .admin-page-name-label {
+      display: block;
+      margin-top: 20px;
+    }
+
+    .admin-page-name {
+      width: min(100%, 420px);
+      margin-top: 8px;
+      padding: 10px 12px;
+      border: 1px solid #9bb8ae;
+      border-radius: 4px;
+      background: #fff;
+      color: #183b38;
+      font: inherit;
+    }
+
+    .subpage-navigation {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .subpage-navigation .action-button {
+      min-width: 0;
+      padding: 10px 14px;
+    }
+
+    #previous-subpage {
+      justify-self: start;
+    }
+
+    #next-subpage {
+      justify-self: end;
+    }
+
+    .subpage-position {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .subpage-navigation .action-button:disabled {
+      background: #aabbb5;
+      cursor: not-allowed;
+    }
+
+    .admin-page-editor {
+      display: block;
+      width: 100%;
+      min-height: 44vh;
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid #c6d7d0;
+      border-radius: 4px;
+      background: #fff;
+      color: #183b38;
+      font: inherit;
+      line-height: 1.6;
+      resize: vertical;
+    }
+
+    .admin-page-editor:focus-visible {
+      outline: 2px solid #167c70;
+      outline-offset: 2px;
+    }
+
+    /* --- classes de 3e page --- */
+    #inside-view {
+      grid-template-rows: auto auto 1fr;
+      justify-items: stretch;
+      text-align: left;
+    }
+
+    #inside-view > .action-button {
+      justify-self: center;
+      margin-top: 28px;
+      order: 3;
+    }
+
+    #inside-view h2 {
+      margin: 0 0 4px;
+      font-size: 24px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .page-subtitle {
+      margin: 0 0 20px;
+      text-align: center;
+      color: #3f6b64;
+    }
+
+    .category-list {
+      display: grid;
+      width: min(100%, 760px);
+      margin: 0 auto;
+      gap: 14px;
+    }
+
+    .category {
+      border: 1px solid #c6d7d0;
+      border-radius: 6px;
+      background: rgb(255 255 255 / 82%);
+      overflow: hidden;
+    }
+
+    .category summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      cursor: pointer;
+      font-size: 19px;
+      font-weight: 600;
+      list-style: none;
+    }
+
+    .category summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .category summary::after {
+      content: "+";
+      color: #167c70;
+      font-size: 22px;
+    }
+
+    .category[open] summary::after {
+      content: "–";
+    }
+
+    .category summary:hover {
+      background: #e3efea;
+    }
+
+    .category summary:focus-visible {
+      outline: 3px solid #e39b50;
+      outline-offset: -3px;
+    }
+
+    .category-body {
+      padding: 0 18px 18px;
+      line-height: 1.65;
+      border-top: 1px solid #c6d7d0;
+    }
+
+    .category-body p {
+      margin: 14px 0 6px;
+    }
+
+    .category-body ul {
+      margin: 0 0 4px;
+      padding-left: 22px;
+    }
+
+    .category-body li {
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 480px) {
+      header {
+        min-height: 96px;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      main {
+        min-height: calc(100vh - 190px);
+      }
+
+      .admin-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .admin-dashboard-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .admin-detail {
+        padding: 20px 56px 24px 18px;
+      }
+
+      .category summary {
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CENTRE D'INFORMATIONS</h1>
+  </header>
+  <main id="home-view">
+    <h2>Bienvenue au centre d'informations</h2>
+    <div class="intro-copy">
+      <p>Notre centre d'informations est un espace dédié à vous fournir des informations utiles, claires et accessibles.</p>
+      <p>Vous trouverez sur ce site toutes les ressources nécessaires, notamment les actualités, les informations pratiques, les documents utiles et les réponses aux questions les plus fréquentes.</p>
+      <p>Notre objectif est de vous permettre d’accéder facilement aux informations dont vous avez besoin, au même endroit et en quelques clics.</p>
+      <p>Explorez notre site et découvrez toutes les informations disponibles !</p>
+    </div>
+    <button class="action-button" id="enter-button" type="button">Entrer</button>
+  </main>
+  <main id="inside-view" aria-live="polite" hidden>
+    <h2>Informations pour les classes de 3e</h2>
+    <p class="page-subtitle">Repères utiles, classés par catégorie.</p>
+    <div class="category-list">
+      <details class="category" open>
+        <summary>Orientation (lycées, filières)</summary>
+        <div class="category-body">
+          <p>Après la 3e, plusieurs voies sont possibles :</p>
+          <ul>
+            <li><strong>2de générale et technologique</strong> : pour préparer un bac général ou technologique.</li>
+            <li><strong>2de professionnelle</strong> ou <strong>CAP</strong> : formation plus concrète, orientée vers un métier.</li>
+          </ul>
+          <p>Comment se décider :</p>
+          <ul>
+            <li>En discuter avec le professeur principal et le/la psy-EN (conseiller·ère d'orientation).</li>
+            <li>Faire le point sur ses résultats scolaires et ses centres d'intérêt.</li>
+            <li>Assister aux journées portes ouvertes des lycées.</li>
+            <li>Utiliser les ressources en ligne de l'ONISEP pour découvrir les filières et les métiers.</li>
+          </ul>
+          <p>Le choix de vœux d'orientation se fait généralement en plusieurs étapes, avec des dates fixées par l'établissement à ne pas manquer.</p>
+        </div>
+      </details>
+      <details class="category">
+        <summary>Stage de 3e / découverte professionnelle</summary>
+        <div class="category-body">
+          <p>Le stage d'observation dure en général une semaine, souvent en fin d'année scolaire.</p>
+          <ul>
+            <li><strong>Trouver un lieu de stage</strong> : entreprise d'un proche, commerce ou administration du secteur, ou aide du CDI/collège.</li>
+            <li><strong>Convention de stage</strong> : document obligatoire à faire remplir et signer par l'établissement, l'entreprise et les responsables légaux avant le début du stage.</li>
+            <li><strong>Pendant le stage</strong> : observer, poser des questions, noter ce qui est utile pour le rapport.</li>
+            <li><strong>Après le stage</strong> : rédiger un rapport ou préparer une restitution orale selon les consignes du collège.</li>
+          </ul>
+        </div>
+      </details>
+      <details class="category">
+        <summary>Brevet des collèges</summary>
+        <div class="category-body">
+          <p>Le diplôme national du brevet (DNB) repose sur deux éléments :</p>
+          <ul>
+            <li><strong>Le contrôle continu</strong> : évaluation des compétences du socle commun tout au long de l'année.</li>
+            <li><strong>Les épreuves finales</strong> : français, mathématiques, histoire-géographie-EMC, sciences (SVT, physique-chimie, technologie), et un oral de soutenance de projet.</li>
+          </ul>
+          <p>Quelques conseils :</p>
+          <ul>
+            <li>Commencer les révisions bien avant les épreuves et s'appuyer sur les annales.</li>
+            <li>Préparer l'oral en s'entraînant à présenter son projet à voix haute.</li>
+            <li>Se renseigner tôt sur les dates officielles auprès du collège.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+    <button class="action-button" id="back-button" type="button">Retour</button>
+  </main>
+  <main id="admin-view" aria-live="polite" hidden>
+    <div class="admin-dashboard" id="admin-dashboard">
+      <div class="admin-dashboard-header">
+        <h2>Espace administrateur</h2>
+        <button class="action-button" id="admin-back-button" type="button">Retour</button>
+      </div>
+      <div class="admin-grid" id="admin-grid" aria-label="Pages administrateur"></div>
+    </div>
+    <section class="admin-detail" id="admin-detail" aria-labelledby="admin-detail-title" hidden>
+      <button class="admin-detail-close" id="close-admin-detail" type="button" aria-label="Fermer la page">×</button>
+      <h2 id="admin-detail-title"></h2>
+      <label class="admin-page-name-label" for="admin-page-name">Nom de la page</label>
+      <input class="admin-page-name" id="admin-page-name" type="text" maxlength="60" autocomplete="off">
+      <nav class="subpage-navigation" aria-label="Navigation entre les cinq sous-pages">
+        <button class="action-button secondary" id="previous-subpage" type="button" disabled>Précédent</button>
+        <span class="subpage-position" id="subpage-position" aria-live="polite">1/5</span>
+        <button class="action-button" id="next-subpage" type="button">Suivant</button>
+      </nav>
+      <textarea class="admin-page-editor" id="admin-page-editor" aria-label="Contenu de la page" placeholder="Écrivez le contenu de cette page ici..."></textarea>
+    </section>
+  </main>
+  <footer class="site-footer" id="site-footer">
+    <button class="admin-link" id="admin-button" type="button" aria-label="Ouvrir l'espace réservé aux administrateurs">
+      <span class="lock-icon" aria-hidden="true">🔒</span>
+      <span>Réservé aux administrateurs</span>
+    </button>
+    <form class="admin-form" id="admin-form" hidden>
+      <label for="admin-code">Code administrateur</label>
+      <div class="password-field">
+        <input id="admin-code" name="admin-code" type="password" autocomplete="off" required>
+        <button class="visibility-toggle" id="toggle-code-visibility" type="button" aria-label="Afficher le code" aria-pressed="false" title="Afficher le code">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+            <path class="eye-slash" d="m3 3 18 18"></path>
+          </svg>
+        </button>
+      </div>
+      <p id="admin-error" role="alert" hidden>Code incorrect. Réessayez.</p>
+      <div class="admin-form-actions">
+        <button class="action-button" type="submit">Valider</button>
+        <button class="action-button secondary" id="cancel-admin" type="button">Annuler</button>
+      </div>
+    </form>
+  </footer>
+  <script>
+    const homeView = document.getElementById("home-view");
+    const insideView = document.getElementById("inside-view");
+    const adminView = document.getElementById("admin-view");
+    const siteFooter = document.getElementById("site-footer");
+    const adminDashboard = document.getElementById("admin-dashboard");
+    const adminGrid = document.getElementById("admin-grid");
+    const adminDetail = document.getElementById("admin-detail");
+    const adminDetailTitle = document.getElementById("admin-detail-title");
+    const adminPageName = document.getElementById("admin-page-name");
+    const adminPageEditor = document.getElementById("admin-page-editor");
+    const subpagePosition = document.getElementById("subpage-position");
+    const previousSubpageButton = document.getElementById("previous-subpage");
+    const nextSubpageButton = document.getElementById("next-subpage");
+    const pageContents = new Map();
+    const pageNames = new Map();
+    const pageButtons = new Map();
+    let currentPageNumber = null;
+    let currentSubpageNumber = 1;
+    const adminForm = document.getElementById("admin-form");
+    const adminCode = document.getElementById("admin-code");
+    const adminError = document.getElementById("admin-error");
+    const visibilityToggle = document.getElementById("toggle-code-visibility");
+
+    for (let pageNumber = 1; pageNumber <= 30; pageNumber += 1) {
+      const pageButton = document.createElement("button");
+      pageButton.className = "admin-page-button";
+      pageButton.type = "button";
+      pageButton.textContent = "+";
+      pageButton.setAttribute("aria-label", `Ouvrir la page ${pageNumber}`);
+      pageButtons.set(pageNumber, pageButton);
+      pageButton.addEventListener("click", () => {
+        currentPageNumber = pageNumber;
+        currentSubpageNumber = 1;
+        const pageName = pageNames.get(pageNumber) ?? "";
+        adminDetailTitle.textContent = pageName || `Page ${pageNumber}`;
+        adminPageName.value = pageName;
+        updateSubpageView();
+        adminDashboard.hidden = true;
+        adminDetail.hidden = false;
+      });
+      adminGrid.append(pageButton);
+    }
+
+    adminPageName.addEventListener("input", () => {
+      if (currentPageNumber === null) return;
+
+      const pageName = adminPageName.value.trim();
+      const pageButton = pageButtons.get(currentPageNumber);
+      const defaultName = `Page ${currentPageNumber}`;
+
+      if (pageName) {
+        pageNames.set(currentPageNumber, pageName);
+      } else {
+        pageNames.delete(currentPageNumber);
+      }
+
+      adminDetailTitle.textContent = pageName || defaultName;
+      pageButton.textContent = pageName || "+";
+      pageButton.className = pageName ? "admin-page-button has-name" : "admin-page-button";
+      pageButton.setAttribute("aria-label", `Ouvrir ${pageName || defaultName}`);
+    });
+
+    adminPageEditor.addEventListener("input", () => {
+      if (currentPageNumber !== null) {
+        pageContents.set(`${currentPageNumber}:${currentSubpageNumber}`, adminPageEditor.value);
+      }
+    });
+
+    function updateSubpageView() {
+      subpagePosition.textContent = `${currentSubpageNumber}/5`;
+      previousSubpageButton.disabled = currentSubpageNumber === 1;
+      nextSubpageButton.disabled = currentSubpageNumber === 5;
+      pageContents.set(`${currentPageNumber}:${currentSubpageNumber}`, pageContents.get(`${currentPageNumber}:${currentSubpageNumber}`) ?? "");
+      adminPageEditor.value = pageContents.get(`${currentPageNumber}:${currentSubpageNumber}`);
+    }
+
+    previousSubpageButton.addEventListener("click", () => {
+      if (currentSubpageNumber > 1) {
+        currentSubpageNumber -= 1;
+        updateSubpageView();
+      }
+    });
+
+    nextSubpageButton.addEventListener("click", () => {
+      if (currentSubpageNumber < 5) {
+        currentSubpageNumber += 1;
+        updateSubpageView();
+      }
+    });
+
+    function setCodeVisibility(visible) {
+      adminCode.type = visible ? "text" : "password";
+      visibilityToggle.setAttribute("aria-pressed", String(visible));
+      visibilityToggle.setAttribute("aria-label", visible ? "Masquer le code" : "Afficher le code");
+      visibilityToggle.title = visible ? "Masquer le code" : "Afficher le code";
+    }
+
+    document.getElementById("enter-button").addEventListener("click", () => {
+      homeView.hidden = true;
+      insideView.hidden = false;
+    });
+
+    document.getElementById("back-button").addEventListener("click", () => {
+      adminForm.hidden = true;
+      adminCode.value = "";
+      setCodeVisibility(false);
+      adminError.hidden = true;
+      insideView.hidden = true;
+      homeView.hidden = false;
+    });
+
+    visibilityToggle.addEventListener("click", () => {
+      setCodeVisibility(adminCode.type === "password");
+    });
+
+    document.getElementById("admin-button").addEventListener("click", () => {
+      adminForm.hidden = false;
+      adminCode.focus();
+    });
+
+    adminForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (adminCode.value === "chessbrawl") {
+        adminForm.hidden = true;
+        adminCode.value = "";
+        setCodeVisibility(false);
+        adminError.hidden = true;
+        insideView.hidden = true;
+        adminView.hidden = false;
+        siteFooter.hidden = true;
+      } else {
+        adminError.hidden = false;
+        adminCode.select();
+      }
+    });
+
+    document.getElementById("cancel-admin").addEventListener("click", () => {
+      adminForm.hidden = true;
+      adminCode.value = "";
+      setCodeVisibility(false);
+      adminError.hidden = true;
+    });
+
+    document.getElementById("admin-back-button").addEventListener("click", () => {
+      adminView.hidden = true;
+      insideView.hidden = false;
+      siteFooter.hidden = false;
+    });
+
+    document.getElementById("close-admin-detail").addEventListener("click", () => {
+      adminDetail.hidden = true;
+      adminDashboard.hidden = false;
+    });
+  </script>
+</body>
+</html>

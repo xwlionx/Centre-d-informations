@@ -359,6 +359,12 @@
       margin-top: 20px;
     }
 
+    .save-status {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: #3f6b64;
+    }
+
     .admin-page-name {
       width: min(100%, 420px);
       margin-top: 8px;
@@ -676,6 +682,7 @@
     <section class="admin-detail" id="admin-detail" aria-labelledby="admin-detail-title" hidden>
       <button class="admin-detail-close" id="close-admin-detail" type="button" aria-label="Fermer la page">×</button>
       <h2 id="admin-detail-title"></h2>
+      <p class="save-status" id="page-save-status" aria-live="polite"></p>
       <label class="admin-page-name-label" for="admin-page-name">Nom de la page</label>
       <input class="admin-page-name" id="admin-page-name" type="text" maxlength="60" autocomplete="off">
       <nav class="subpage-navigation" aria-label="Navigation entre les cinq sous-pages">
@@ -734,6 +741,89 @@
     const adminError = document.getElementById("admin-error");
     const visibilityToggle = document.getElementById("toggle-code-visibility");
 
+    const pageSaveStatus = document.getElementById("page-save-status");
+
+    // --- Persistance des pages administrateur (capacité "db") ---
+    // Les 30 pages x 5 sous-pages sont enregistrées dans une base de
+    // données propre à cet artifact, pour survivre aux rechargements et
+    // aux republications, et pas seulement le temps de la session.
+    let db = null;
+    let dbReady = (async () => {
+      try {
+        if (window.claude && typeof window.claude.use === "function") {
+          db = await window.claude.use("db");
+        }
+      } catch (error) {
+        db = null;
+      }
+      if (db) {
+        loadAllPageNames();
+      } else {
+        setSaveStatus("Sauvegarde en ligne indisponible : les modifications resteront temporaires.");
+      }
+    })();
+
+    function setSaveStatus(text) {
+      pageSaveStatus.textContent = text;
+    }
+
+    async function loadAllPageNames() {
+      try {
+        const snapshot = await db.collection("pages").get();
+        snapshot.docs.forEach((docSnap) => {
+          const pageNumber = Number(docSnap.id);
+          if (!Number.isInteger(pageNumber)) return;
+          const data = docSnap.data();
+          const pageButton = pageButtons.get(pageNumber);
+          const name = data && typeof data.name === "string" ? data.name.trim() : "";
+          if (name) {
+            pageNames.set(pageNumber, name);
+            if (pageButton) {
+              pageButton.textContent = name;
+              pageButton.className = "admin-page-button has-name";
+              pageButton.setAttribute("aria-label", `Ouvrir ${name}`);
+            }
+          }
+        });
+      } catch (error) {
+        // La liste n'a pas pu être chargée : les boutons restent sur "+",
+        // chaque page tentera quand même de charger son propre contenu.
+      }
+    }
+
+    const saveTimers = new Map();
+    let saveChain = Promise.resolve();
+
+    function scheduleSave(pageNumber) {
+      if (!db) return;
+      setSaveStatus("Modifications non enregistrées…");
+      clearTimeout(saveTimers.get(pageNumber));
+      saveTimers.set(
+        pageNumber,
+        setTimeout(() => savePage(pageNumber), 800),
+      );
+    }
+
+    function savePage(pageNumber) {
+      const name = pageNames.get(pageNumber) || "";
+      const subpages = [1, 2, 3, 4, 5].map(
+        (subpageNumber) => pageContents.get(`${pageNumber}:${subpageNumber}`) || "",
+      );
+      setSaveStatus("Enregistrement…");
+      saveChain = saveChain
+        .then(() => db.doc(`pages/${pageNumber}`).set({ name, subpages }))
+        .then(() => {
+          if (currentPageNumber === pageNumber) {
+            setSaveStatus("Enregistré");
+          }
+        })
+        .catch(() => {
+          if (currentPageNumber === pageNumber) {
+            setSaveStatus("Échec de l'enregistrement, nouvelle tentative à la prochaine modification.");
+          }
+        });
+    }
+
     for (let pageNumber = 1; pageNumber <= 30; pageNumber += 1) {
       const pageButton = document.createElement("button");
       pageButton.className = "admin-page-button";
@@ -741,15 +831,42 @@
       pageButton.textContent = "+";
       pageButton.setAttribute("aria-label", `Ouvrir la page ${pageNumber}`);
       pageButtons.set(pageNumber, pageButton);
-      pageButton.addEventListener("click", () => {
+      pageButton.addEventListener("click", async () => {
         currentPageNumber = pageNumber;
         currentSubpageNumber = 1;
+        const defaultName = `Page ${pageNumber}`;
         const pageName = pageNames.get(pageNumber) ?? "";
-        adminDetailTitle.textContent = pageName || `Page ${pageNumber}`;
+        adminDetailTitle.textContent = pageName || defaultName;
         adminPageName.value = pageName;
         updateSubpageView();
         adminDashboard.hidden = true;
         adminDetail.hidden = false;
+        setSaveStatus(db ? "" : "Sauvegarde en ligne indisponible : les modifications resteront temporaires.");
+
+        if (db) {
+          setSaveStatus("Chargement…");
+          try {
+            const snap = await db.doc(`pages/${pageNumber}`).get();
+            if (currentPageNumber !== pageNumber) return; // l'utilisateur a changé de page entre-temps
+            if (snap.exists) {
+              const data = snap.data();
+              const name = data && typeof data.name === "string" ? data.name : "";
+              pageNames.set(pageNumber, name);
+              adminPageName.value = name;
+              adminDetailTitle.textContent = name || defaultName;
+              pageButton.textContent = name || "+";
+              pageButton.className = name ? "admin-page-button has-name" : "admin-page-button";
+              const subpages = Array.isArray(data.subpages) ? data.subpages : [];
+              for (let i = 0; i < 5; i += 1) {
+                pageContents.set(`${pageNumber}:${i + 1}`, typeof subpages[i] === "string" ? subpages[i] : "");
+              }
+              updateSubpageView();
+            }
+            setSaveStatus("Enregistré");
+          } catch (error) {
+            setSaveStatus("Impossible de charger cette page depuis la sauvegarde en ligne.");
+          }
+        }
       });
       adminGrid.append(pageButton);
     }
@@ -771,11 +888,13 @@
       pageButton.textContent = pageName || "+";
       pageButton.className = pageName ? "admin-page-button has-name" : "admin-page-button";
       pageButton.setAttribute("aria-label", `Ouvrir ${pageName || defaultName}`);
+      scheduleSave(currentPageNumber);
     });
 
     adminPageEditor.addEventListener("input", () => {
       if (currentPageNumber !== null) {
         pageContents.set(`${currentPageNumber}:${currentSubpageNumber}`, adminPageEditor.value);
+        scheduleSave(currentPageNumber);
       }
     });
 

@@ -820,6 +820,10 @@
       adminError.hidden = true;
       insideView.hidden = true;
       homeView.hidden = false;
+      if (lockCountdownInterval) {
+        clearInterval(lockCountdownInterval);
+        lockCountdownInterval = null;
+      }
     });
 
     visibilityToggle.addEventListener("click", () => {
@@ -828,7 +832,12 @@
 
     document.getElementById("admin-button").addEventListener("click", () => {
       adminForm.hidden = false;
-      adminCode.focus();
+      const state = readLockState();
+      if (state.lockUntil > Date.now()) {
+        applyLockUI(state.lockUntil);
+      } else {
+        adminCode.focus();
+      }
     });
 
     // Empreinte SHA-256 du code administrateur : le mot de passe en clair
@@ -843,14 +852,101 @@
         .join("");
     }
 
+    // --- Verrouillage progressif après plusieurs échecs ---
+    // Après 3 codes incorrects, le formulaire se bloque 30 secondes.
+    // Si de nouveaux échecs surviennent après ce blocage, la durée
+    // double à chaque fois (30 s, 60 s, 120 s, ...).
+    const ADMIN_LOCK_STORAGE_KEY = "adminLoginLock";
+    const MAX_ATTEMPTS_BEFORE_LOCK = 3;
+    const BASE_LOCK_SECONDS = 30;
+    let lockCountdownInterval = null;
+
+    function readLockState() {
+      try {
+        const raw = localStorage.getItem(ADMIN_LOCK_STORAGE_KEY);
+        if (!raw) return { attempts: 0, lockStage: 0, lockUntil: 0 };
+        const parsed = JSON.parse(raw);
+        return {
+          attempts: Number(parsed.attempts) || 0,
+          lockStage: Number(parsed.lockStage) || 0,
+          lockUntil: Number(parsed.lockUntil) || 0,
+        };
+      } catch (error) {
+        return { attempts: 0, lockStage: 0, lockUntil: 0 };
+      }
+    }
+
+    function writeLockState(state) {
+      try {
+        localStorage.setItem(ADMIN_LOCK_STORAGE_KEY, JSON.stringify(state));
+      } catch (error) {
+        // Stockage local indisponible : le verrouillage ne persistera pas
+        // après un rechargement, mais le formulaire reste fonctionnel.
+      }
+    }
+
+    function formatRemaining(ms) {
+      const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return minutes > 0
+        ? `${minutes} min ${String(seconds).padStart(2, "0")} s`
+        : `${seconds} s`;
+    }
+
+    function clearLockUI() {
+      if (lockCountdownInterval) {
+        clearInterval(lockCountdownInterval);
+        lockCountdownInterval = null;
+      }
+      adminCode.disabled = false;
+      adminForm.querySelector('button[type="submit"]').disabled = false;
+    }
+
+    function applyLockUI(lockUntil) {
+      const submitButton = adminForm.querySelector('button[type="submit"]');
+      const remaining = lockUntil - Date.now();
+
+      if (remaining <= 0) {
+        clearLockUI();
+        adminError.hidden = true;
+        return;
+      }
+
+      submitButton.disabled = true;
+      adminCode.disabled = true;
+      adminError.hidden = false;
+      adminError.textContent = `Trop de tentatives. Réessayez dans ${formatRemaining(remaining)}.`;
+
+      if (!lockCountdownInterval) {
+        lockCountdownInterval = setInterval(() => {
+          const state = readLockState();
+          const stillRemaining = state.lockUntil - Date.now();
+          if (stillRemaining <= 0) {
+            applyLockUI(state.lockUntil);
+          } else {
+            adminError.textContent = `Trop de tentatives. Réessayez dans ${formatRemaining(stillRemaining)}.`;
+          }
+        }, 1000);
+      }
+    }
+
     adminForm.addEventListener("submit", async (event) => {
       event.preventDefault();
+
+      const lockState = readLockState();
+      if (lockState.lockUntil > Date.now()) {
+        applyLockUI(lockState.lockUntil);
+        return;
+      }
+
       const submitButton = adminForm.querySelector('button[type="submit"]');
       submitButton.disabled = true;
 
       const enteredHash = await sha256Hex(adminCode.value);
 
       if (enteredHash === ADMIN_CODE_HASH) {
+        writeLockState({ attempts: 0, lockStage: 0, lockUntil: 0 });
         adminForm.hidden = true;
         adminCode.value = "";
         setCodeVisibility(false);
@@ -860,7 +956,22 @@
         adminView.hidden = false;
         siteFooter.hidden = true;
       } else {
+        lockState.attempts += 1;
+
+        if (lockState.attempts >= MAX_ATTEMPTS_BEFORE_LOCK) {
+          lockState.lockStage += 1;
+          lockState.lockUntil = Date.now() + BASE_LOCK_SECONDS * 1000 * Math.pow(2, lockState.lockStage - 1);
+          lockState.attempts = 0;
+          writeLockState(lockState);
+          applyLockUI(lockState.lockUntil);
+          adminCode.select();
+          return;
+        }
+
+        writeLockState(lockState);
+        const remainingAttempts = MAX_ATTEMPTS_BEFORE_LOCK - lockState.attempts;
         adminError.hidden = false;
+        adminError.textContent = `Code incorrect. ${remainingAttempts} tentative${remainingAttempts > 1 ? "s" : ""} restante${remainingAttempts > 1 ? "s" : ""} avant verrouillage.`;
         adminCode.select();
       }
 
@@ -872,6 +983,10 @@
       adminCode.value = "";
       setCodeVisibility(false);
       adminError.hidden = true;
+      if (lockCountdownInterval) {
+        clearInterval(lockCountdownInterval);
+        lockCountdownInterval = null;
+      }
     });
 
     document.getElementById("admin-back-button").addEventListener("click", () => {

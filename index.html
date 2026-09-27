@@ -831,9 +831,26 @@
       adminCode.focus();
     });
 
-    adminForm.addEventListener("submit", (event) => {
+    // Empreinte SHA-256 du code administrateur : le mot de passe en clair
+    // n'apparaît nulle part dans le code source de la page.
+    const ADMIN_CODE_HASH = "298774245705990eff8e87a2adf434665b24fe45c5c1939213bc9a935959c5b2";
+
+    async function sha256Hex(text) {
+      const data = new TextEncoder().encode(text);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    adminForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (adminCode.value === "chessbrawl") {
+      const submitButton = adminForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+
+      const enteredHash = await sha256Hex(adminCode.value);
+
+      if (enteredHash === ADMIN_CODE_HASH) {
         adminForm.hidden = true;
         adminCode.value = "";
         setCodeVisibility(false);
@@ -846,6 +863,8 @@
         adminError.hidden = false;
         adminCode.select();
       }
+
+      submitButton.disabled = false;
     });
 
     document.getElementById("cancel-admin").addEventListener("click", () => {

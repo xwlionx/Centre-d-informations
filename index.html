@@ -564,7 +564,7 @@
     <h2>Informations pour les classes de 3e</h2>
     <p class="page-subtitle">Repères utiles, classés par catégorie.</p>
     <div class="category-list">
-      <details class="category" open>
+      <details class="category">
         <summary>Orientation (lycées, filières)</summary>
         <div class="category-body">
           <p>Après la 3e, plusieurs voies sont possibles :</p>
@@ -608,6 +608,58 @@
             <li>Préparer l'oral en s'entraînant à présenter son projet à voix haute.</li>
             <li>Se renseigner tôt sur les dates officielles auprès du collège.</li>
           </ul>
+        </div>
+      </details>
+      <details class="category">
+        <summary>Je m'informe</summary>
+        <div class="category-body">
+          <p>S'informer, c'est utile, mais toutes les sources ne se valent pas :</p>
+          <ul>
+            <li>Vérifier qui a écrit l'information et sur quel site elle est publiée.</li>
+            <li>Croiser une information surprenante avec au moins une autre source fiable avant d'y croire ou de la partager.</li>
+            <li>Distinguer un fait, une opinion et une publicité.</li>
+            <li>Se méfier des titres trop sensationnalistes ou des images qui semblent trop parfaites.</li>
+          </ul>
+          <p>Des ressources pour s'entraîner :</p>
+          <ul>
+            <li>Le CLEMI (éducation aux médias) propose des fiches et des ateliers dans les collèges.</li>
+            <li>Les émissions et sites d'actualité destinés aux jeunes expliquent l'actualité avec des mots simples.</li>
+            <li>Le CDI du collège et les professeurs documentalistes peuvent aider à trouver des sources fiables.</li>
+          </ul>
+          <p>Quelques sites pour s'entraîner (niveau 3e) et apprendre de nouvelles choses :</p>
+          <ul>
+            <li><a href="https://www.lumni.fr" target="_blank" rel="noopener">Lumni</a> : vidéos, fiches et quiz par matière et par niveau, proposés par France Télévisions et l'Éducation nationale.</li>
+            <li><a href="https://www.vikidia.org" target="_blank" rel="noopener">Vikidia</a> : une encyclopédie en ligne écrite pour être comprise dès 8-13 ans.</li>
+            <li><a href="https://www.1jour1actu.com" target="_blank" rel="noopener">1jour1actu</a> : l'actualité de la semaine expliquée simplement.</li>
+            <li><a href="https://www.reseau-canope.fr" target="_blank" rel="noopener">Réseau Canopé</a> : ressources pédagogiques et culturelles pour réviser et approfondir un sujet.</li>
+            <li><a href="https://www.onisep.fr" target="_blank" rel="noopener">ONISEP</a> : déjà cité pour l'orientation, mais utile aussi pour découvrir des métiers et des filières.</li>
+          </ul>
+        </div>
+      </details>
+      <details class="category">
+        <summary>Je prends soin de moi</summary>
+        <div class="category-body">
+          <p>Prendre soin de sa santé et de son bien-être, c'est aussi important que les résultats scolaires :</p>
+          <ul>
+            <li><strong>Sommeil</strong> : viser des horaires réguliers, surtout les veilles de cours.</li>
+            <li><strong>Alimentation et activité physique</strong> : manger équilibré et bouger régulièrement aident à mieux se concentrer.</li>
+            <li><strong>Stress et émotions</strong> : en parler à un adulte de confiance (parent, infirmier·ère scolaire, professeur) plutôt que de garder ça pour soi.</li>
+            <li><strong>Écoute et soutien</strong> : l'infirmerie et le/la psychologue de l'Éducation nationale sont là pour écouter, en toute confidentialité.</li>
+          </ul>
+          <p>En cas de besoin, il existe des lignes d'écoute gratuites et anonymes pour les jeunes, comme le 3018 (harcèlement, violences en ligne) ou le 3114 (souffrance psychique, prévention du suicide).</p>
+        </div>
+      </details>
+      <details class="category">
+        <summary>Je suis connecté</summary>
+        <div class="category-body">
+          <p>Internet et les réseaux sociaux font partie du quotidien : quelques réflexes utiles pour les utiliser sereinement.</p>
+          <ul>
+            <li>Régler ses comptes en privé et vérifier qui peut voir ses publications et ses données personnelles.</li>
+            <li>Ne jamais partager son mot de passe, ses coordonnées ou des photos gênantes, même avec des personnes que l'on croit connaître en ligne.</li>
+            <li>Garder des traces (captures d'écran) en cas de message insultant ou de harcèlement, et en parler à un adulte.</li>
+            <li>Signaler les contenus choquants ou les comptes suspects directement sur les plateformes.</li>
+          </ul>
+          <p>En cas de cyberharcèlement, le numéro national 3018 (appel et tchat gratuits) permet d'être aidé rapidement et de faire retirer des contenus.</p>
         </div>
       </details>
     </div>
@@ -786,6 +838,7 @@
         adminCode.value = "";
         setCodeVisibility(false);
         adminError.hidden = true;
+        homeView.hidden = true;
         insideView.hidden = true;
         adminView.hidden = false;
         siteFooter.hidden = true;
@@ -804,7 +857,8 @@
 
     document.getElementById("admin-back-button").addEventListener("click", () => {
       adminView.hidden = true;
-      insideView.hidden = false;
+      insideView.hidden = true;
+      homeView.hidden = false;
       siteFooter.hidden = false;
     });
 

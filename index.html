@@ -717,7 +717,23 @@
       </div>
     </form>
   </footer>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script>
+    // ==========================================================
+    // CONFIGURATION FIREBASE : à remplacer par les identifiants
+    // de VOTRE projet (Console Firebase > Paramètres du projet >
+    // Vos applications > icône Web </>).
+    // ==========================================================
+    const firebaseConfig = {
+      apiKey: "VOTRE_API_KEY",
+      authDomain: "VOTRE_PROJET.firebaseapp.com",
+      projectId: "VOTRE_PROJET",
+      storageBucket: "VOTRE_PROJET.appspot.com",
+      messagingSenderId: "VOTRE_SENDER_ID",
+      appId: "VOTRE_APP_ID",
+    };
+
     const homeView = document.getElementById("home-view");
     const insideView = document.getElementById("inside-view");
     const adminView = document.getElementById("admin-view");
@@ -742,26 +758,7 @@
     const visibilityToggle = document.getElementById("toggle-code-visibility");
 
     const pageSaveStatus = document.getElementById("page-save-status");
-
-    // --- Persistance des pages administrateur (capacité "db") ---
-    // Les 30 pages x 5 sous-pages sont enregistrées dans une base de
-    // données propre à cet artifact, pour survivre aux rechargements et
-    // aux republications, et pas seulement le temps de la session.
     let db = null;
-    let dbReady = (async () => {
-      try {
-        if (window.claude && typeof window.claude.use === "function") {
-          db = await window.claude.use("db");
-        }
-      } catch (error) {
-        db = null;
-      }
-      if (db) {
-        loadAllPageNames();
-      } else {
-        setSaveStatus("Sauvegarde en ligne indisponible : les modifications resteront temporaires.");
-      }
-    })();
 
     function setSaveStatus(text) {
       pageSaveStatus.textContent = text;
@@ -869,6 +866,19 @@
         }
       });
       adminGrid.append(pageButton);
+    }
+
+    // --- Persistance des pages administrateur (Firebase Firestore) ---
+    // Les 30 pages x 5 sous-pages sont enregistrées dans Firestore, pour
+    // survivre aux rechargements, aux fermetures de navigateur et être
+    // accessibles depuis n'importe quel appareil.
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      loadAllPageNames();
+    } catch (error) {
+      db = null;
+      setSaveStatus("Sauvegarde en ligne indisponible : vérifiez la configuration Firebase (firebaseConfig).");
     }
 
     adminPageName.addEventListener("input", () => {

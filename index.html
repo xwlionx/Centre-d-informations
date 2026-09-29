@@ -801,25 +801,26 @@
       );
     }
 
-    function savePage(pageNumber) {
-      const name = pageNames.get(pageNumber) || "";
-      const subpages = [1, 2, 3, 4, 5].map(
-        (subpageNumber) => pageContents.get(`${pageNumber}:${subpageNumber}`) || "",
-      );
-      setSaveStatus("Enregistrement…");
-      saveChain = saveChain
-        .then(() => db.doc(`pages/${pageNumber}`).set({ name, subpages }))
-        .then(() => {
-          if (currentPageNumber === pageNumber) {
-            setSaveStatus("Enregistré");
-          }
-        })
-        .catch(() => {
-          if (currentPageNumber === pageNumber) {
-            setSaveStatus("Échec de l'enregistrement, nouvelle tentative à la prochaine modification.");
-          }
-        });
-    }
+function savePage(pageNumber) {
+  const name = pageNames.get(pageNumber) || "";
+  const subpages = [1, 2, 3, 4, 5].map(
+    (subpageNumber) => pageContents.get(`${pageNumber}:${subpageNumber}`) || "",
+  );
+  setSaveStatus("Enregistrement…");
+  saveChain = saveChain
+    .then(() => db.doc(`pages/${pageNumber}`).set({ name, subpages }))
+    .then(() => {
+      if (currentPageNumber === pageNumber) {
+        setSaveStatus("Enregistré");
+      }
+    })
+    .catch((error) => {
+      console.error("Erreur Firestore :", error);
+      if (currentPageNumber === pageNumber) {
+        setSaveStatus("Échec : " + (error.code || error.message));
+      }
+    });
+}
 
     for (let pageNumber = 1; pageNumber <= 30; pageNumber += 1) {
       const pageButton = document.createElement("button");

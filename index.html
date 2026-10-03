@@ -433,8 +433,9 @@
       text-align: left;
     }
 
-    #inside-view > .action-button {
-      justify-self: center;
+    .page-nav-row {
+      display: flex;
+      justify-content: space-between;
       margin-top: 28px;
       order: 3;
     }
@@ -519,6 +520,197 @@
       margin-bottom: 6px;
     }
 
+    /* --- page programme des matières --- */
+    #subjects-view {
+      grid-template-rows: auto auto auto 1fr;
+      justify-items: stretch;
+      text-align: left;
+    }
+
+    #subjects-view h2 {
+      margin: 0 0 4px;
+      font-size: 24px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .subjects-toolbar {
+      width: min(100%, 760px);
+      margin: 4px auto 20px;
+    }
+
+    .subject-search {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #9bb8ae;
+      border-radius: 8px;
+      background: #fff;
+      color: #183b38;
+      font: inherit;
+      font-size: 16px;
+    }
+
+    .subject-search:focus-visible {
+      outline: 2px solid #167c70;
+      outline-offset: 2px;
+    }
+
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 16px;
+      width: min(100%, 920px);
+      margin: 0 auto;
+    }
+
+    .subject-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px 16px 16px;
+      border: 1px solid #c6d7d0;
+      border-top: 5px solid var(--subject-color, #167c70);
+      border-radius: 10px;
+      background: rgb(255 255 255 / 85%);
+      text-align: left;
+    }
+
+    .subject-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .subject-icon {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .subject-name {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .subject-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .subject-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--subject-color, #167c70) 16%, white);
+      color: var(--subject-color, #167c70);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .subject-revise-button {
+      align-self: flex-start;
+      margin-top: auto;
+      padding: 8px 14px;
+      border: 1px solid var(--subject-color, #167c70);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--subject-color, #167c70);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .subject-revise-button:hover {
+      background: var(--subject-color, #167c70);
+      color: #fff;
+    }
+
+    .subject-revise-button:focus-visible {
+      outline: 3px solid #e39b50;
+      outline-offset: 2px;
+    }
+
+    .subjects-empty {
+      width: min(100%, 760px);
+      margin: 12px auto 0;
+      color: #3f6b64;
+      text-align: center;
+    }
+
+    .subjects-empty[hidden] {
+      display: none;
+    }
+
+    .page-nav-row .nav-back {
+      margin-right: auto;
+    }
+
+    .subject-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgb(24 59 56 / 55%);
+    }
+
+    .subject-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .subject-modal {
+      width: min(560px, 100%);
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      border-top: 6px solid var(--subject-color, #167c70);
+      border-radius: 10px;
+      background: #fdfdfb;
+    }
+
+    .subject-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .subject-modal-header .subject-icon {
+      font-size: 34px;
+    }
+
+    .subject-modal h3 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 600;
+    }
+
+    .subject-modal-list {
+      margin: 14px 0 22px;
+      padding-left: 22px;
+      line-height: 1.65;
+    }
+
+    .subject-modal-list li {
+      margin-bottom: 8px;
+    }
+
     @media (max-width: 480px) {
       header {
         min-height: 96px;
@@ -548,6 +740,32 @@
 
       .category summary {
         font-size: 17px;
+      }
+
+      .subjects-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .subject-card {
+        padding: 14px 14px 12px;
+      }
+
+      .subject-icon {
+        font-size: 24px;
+      }
+
+      .subject-name {
+        font-size: 16px;
+      }
+
+      .subject-modal {
+        padding: 18px;
+        max-height: 90vh;
+      }
+
+      .page-nav-row {
+        gap: 10px;
       }
     }
   </style>
@@ -669,8 +887,35 @@
         </div>
       </details>
     </div>
-    <button class="action-button" id="back-button" type="button">Retour</button>
+    <div class="page-nav-row">
+      <button class="action-button nav-back" id="back-button" type="button">← Retour</button>
+      <button class="action-button nav-next" id="subjects-button" type="button">Suite →</button>
+    </div>
   </main>
+  <main id="subjects-view" aria-live="polite" hidden>
+    <h2>Programme des matières de 3e</h2>
+    <p class="page-subtitle">Un aperçu des grands thèmes étudiés dans chaque matière.</p>
+    <div class="subjects-toolbar">
+      <label for="subject-search" class="sr-only">Rechercher une matière</label>
+      <input class="subject-search" id="subject-search" type="search" placeholder="Rechercher une matière… (ex. maths, histoire)" autocomplete="off">
+    </div>
+    <div class="subjects-grid" id="subjects-grid"></div>
+    <p class="subjects-empty" id="subjects-empty" hidden>Aucune matière ne correspond à votre recherche.</p>
+    <div class="page-nav-row">
+      <button class="action-button nav-back" id="subjects-back-button" type="button">← Retour</button>
+    </div>
+  </main>
+
+  <div class="subject-modal-overlay" id="subject-modal-overlay" hidden>
+    <div class="subject-modal" id="subject-modal" role="dialog" aria-modal="true" aria-labelledby="subject-modal-title">
+      <div class="subject-modal-header">
+        <span class="subject-icon" id="subject-modal-icon" aria-hidden="true"></span>
+        <h3 id="subject-modal-title"></h3>
+      </div>
+      <ul class="subject-modal-list" id="subject-modal-list"></ul>
+      <button class="action-button secondary nav-back" id="subject-modal-close" type="button">← Retour</button>
+    </div>
+  </div>
   <main id="admin-view" aria-live="polite" hidden>
     <div class="admin-dashboard" id="admin-dashboard">
       <div class="admin-dashboard-header">
@@ -736,6 +981,7 @@
 
     const homeView = document.getElementById("home-view");
     const insideView = document.getElementById("inside-view");
+    const subjectsView = document.getElementById("subjects-view");
     const adminView = document.getElementById("admin-view");
     const siteFooter = document.getElementById("site-footer");
     const adminDashboard = document.getElementById("admin-dashboard");
@@ -801,26 +1047,26 @@
       );
     }
 
-function savePage(pageNumber) {
-  const name = pageNames.get(pageNumber) || "";
-  const subpages = [1, 2, 3, 4, 5].map(
-    (subpageNumber) => pageContents.get(`${pageNumber}:${subpageNumber}`) || "",
-  );
-  setSaveStatus("Enregistrement…");
-  saveChain = saveChain
-    .then(() => db.doc(`pages/${pageNumber}`).set({ name, subpages }))
-    .then(() => {
-      if (currentPageNumber === pageNumber) {
-        setSaveStatus("Enregistré");
-      }
-    })
-    .catch((error) => {
-      console.error("Erreur Firestore :", error);
-      if (currentPageNumber === pageNumber) {
-        setSaveStatus("Échec : " + (error.code || error.message));
-      }
-    });
-}
+    function savePage(pageNumber) {
+      const name = pageNames.get(pageNumber) || "";
+      const subpages = [1, 2, 3, 4, 5].map(
+        (subpageNumber) => pageContents.get(`${pageNumber}:${subpageNumber}`) || "",
+      );
+      setSaveStatus("Enregistrement…");
+      saveChain = saveChain
+        .then(() => db.doc(`pages/${pageNumber}`).set({ name, subpages }))
+        .then(() => {
+          if (currentPageNumber === pageNumber) {
+            setSaveStatus("Enregistré");
+          }
+        })
+        .catch((error) => {
+          console.error("Erreur Firestore :", error);
+          if (currentPageNumber === pageNumber) {
+            setSaveStatus("Échec : " + (error.code || error.message));
+          }
+        });
+    }
 
     for (let pageNumber = 1; pageNumber <= 30; pageNumber += 1) {
       const pageButton = document.createElement("button");
@@ -938,8 +1184,239 @@ function savePage(pageNumber) {
       visibilityToggle.title = visible ? "Masquer le code" : "Afficher le code";
     }
 
+    // --- Cartes des matières (page "programme de 3e") ---
+    const SUBJECTS = [
+      {
+        id: "francais",
+        name: "Français",
+        icon: "📖",
+        color: "#8e44ad",
+        aliases: ["francais", "litterature"],
+        pills: ["Œuvres littéraires", "Expression écrite", "Grammaire", "Oral du brevet"],
+        details: [
+          "Étude d'œuvres complètes (roman, théâtre, poésie) et de textes du XIXe au XXIe siècle.",
+          "Perfectionnement de l'expression écrite : argumenter, raconter, décrire.",
+          "Grammaire et orthographe approfondies, en lien avec l'épreuve écrite du brevet.",
+          "Préparation à l'oral du brevet : présenter un projet ou une œuvre à l'oral.",
+        ],
+      },
+      {
+        id: "mathematiques",
+        name: "Mathématiques",
+        icon: "🔢",
+        color: "#2980b9",
+        aliases: ["maths", "math"],
+        pills: ["Calcul littéral", "Géométrie", "Fonctions", "Probabilités", "Programmation"],
+        details: [
+          "Nombres relatifs, fractions, puissances et calcul littéral.",
+          "Géométrie : théorème de Pythagore, théorème de Thalès, trigonométrie.",
+          "Fonctions et proportionnalité.",
+          "Statistiques, probabilités et initiation à la programmation (Scratch ou Python selon l'établissement).",
+        ],
+      },
+      {
+        id: "histoire-geo-emc",
+        name: "Histoire – Géographie – EMC",
+        icon: "🗺️",
+        color: "#c0392b",
+        aliases: ["histoire", "geo", "géo", "geographie", "géographie", "emc"],
+        pills: ["XXe siècle", "Mondialisation", "Citoyenneté", "Institutions"],
+        details: [
+          "Histoire : le monde depuis 1914, les deux guerres mondiales, la guerre froide, la Ve République.",
+          "Géographie : la France et l'Union européenne dans le monde, mondialisation, aménagement du territoire.",
+          "EMC : citoyenneté, institutions, défense et sécurité, droits et libertés.",
+        ],
+      },
+      {
+        id: "svt",
+        name: "SVT",
+        icon: "🌱",
+        color: "#27ae60",
+        aliases: ["sciences", "svt", "biologie"],
+        pills: ["Reproduction", "Évolution", "Risques naturels", "Système nerveux"],
+        details: [
+          "Reproduction humaine et éducation à la sexualité.",
+          "Évolution des espèces et parenté entre êtres vivants.",
+          "Risques naturels et impact humain sur l'environnement.",
+          "Fonctionnement du système nerveux et comportements responsables (santé, addictions).",
+        ],
+      },
+      {
+        id: "physique-chimie",
+        name: "Physique – Chimie",
+        icon: "⚛️",
+        color: "#d35400",
+        aliases: ["physique", "chimie", "pc"],
+        pills: ["Matière", "Mouvement & forces", "Énergie", "Circuits électriques"],
+        details: [
+          "Organisation et transformations de la matière (atomes, molécules, réactions chimiques).",
+          "Mouvement et interactions : vitesse, forces, gravitation.",
+          "Énergie : formes, transferts et économies d'énergie.",
+          "Signaux électriques et circuits simples.",
+        ],
+      },
+      {
+        id: "technologie",
+        name: "Technologie",
+        icon: "🛠️",
+        color: "#16a085",
+        pills: ["Conception (CAO)", "Programmation", "Impression 3D"],
+        details: [
+          "Conception et modélisation d'objets techniques (logiciels de CAO).",
+          "Programmation et algorithmique appliquées à des objets connectés.",
+          "Impression 3D et prototypage, selon les équipements du collège.",
+        ],
+      },
+      {
+        id: "anglais",
+        name: "Anglais",
+        icon: "🇬🇧",
+        color: "#0097a7",
+        aliases: ["anglais", "english", "lv1"],
+        pills: ["Expression orale", "Compréhension écrite", "Culture anglophone", "Niveau A2-B1"],
+        details: [
+          "Compréhension orale et écrite de documents authentiques (articles, vidéos, chansons).",
+          "Expression orale en continu et en interaction : exposés, dialogues, débats simples.",
+          "Enrichissement du vocabulaire et consolidation des structures grammaticales.",
+          "Découverte de la culture, de l'histoire et de l'actualité des pays anglophones.",
+          "Niveau visé en fin de 3e : A2 à B1 selon le Cadre européen (CECRL).",
+        ],
+      },
+      {
+        id: "eps",
+        name: "EPS",
+        icon: "⚽",
+        color: "#2c3e50",
+        pills: ["Activités physiques", "Coopération", "Contrôle continu"],
+        details: [
+          "Plusieurs activités physiques et sportives réparties sur l'année (athlétisme, sports collectifs, natation, etc.).",
+          "Travail sur la coopération, le respect des règles et de l'arbitre.",
+          "Épreuves d'EPS prises en compte dans le contrôle continu du brevet.",
+        ],
+      },
+      {
+        id: "arts-plastiques",
+        name: "Arts plastiques",
+        icon: "🎨",
+        color: "#e84393",
+        pills: ["Pratiques artistiques", "Histoire de l'art"],
+        details: [
+          "Pratiques artistiques variées : dessin, volume, photographie, numérique.",
+          "Analyse d'œuvres et repères en histoire de l'art.",
+          "Lien possible avec l'oral du brevet si le projet choisi porte sur les arts.",
+        ],
+      },
+      {
+        id: "musique",
+        name: "Éducation musicale",
+        icon: "🎵",
+        color: "#f39c12",
+        pills: ["Pratique vocale", "Écoute", "Histoire de la musique"],
+        details: [
+          "Pratique vocale collective et découverte d'instruments.",
+          "Écoute et analyse d'œuvres musicales de styles variés.",
+          "Repères historiques et culturels en histoire des arts.",
+        ],
+      },
+    ];
+
+    const subjectsGrid = document.getElementById("subjects-grid");
+    const subjectSearch = document.getElementById("subject-search");
+    const subjectsEmpty = document.getElementById("subjects-empty");
+    const subjectModalOverlay = document.getElementById("subject-modal-overlay");
+    const subjectModalIcon = document.getElementById("subject-modal-icon");
+    const subjectModalTitle = document.getElementById("subject-modal-title");
+    const subjectModalList = document.getElementById("subject-modal-list");
+    const subjectModalClose = document.getElementById("subject-modal-close");
+
+    function openSubjectModal(subject) {
+      subjectModalIcon.textContent = subject.icon;
+      subjectModalTitle.textContent = subject.name;
+      subjectModalList.innerHTML = "";
+      subject.details.forEach((line) => {
+        const li = document.createElement("li");
+        li.textContent = line;
+        subjectModalList.append(li);
+      });
+      subjectModalOverlay.style.setProperty("--subject-color", subject.color);
+      subjectModalOverlay.hidden = false;
+      subjectModalClose.focus();
+    }
+
+    function closeSubjectModal() {
+      subjectModalOverlay.hidden = true;
+    }
+
+    subjectModalClose.addEventListener("click", closeSubjectModal);
+    subjectModalOverlay.addEventListener("click", (event) => {
+      if (event.target === subjectModalOverlay) closeSubjectModal();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !subjectModalOverlay.hidden) closeSubjectModal();
+    });
+
+    SUBJECTS.forEach((subject) => {
+      const card = document.createElement("article");
+      card.className = "subject-card";
+      card.style.setProperty("--subject-color", subject.color);
+      const aliasText = (subject.aliases || []).join(" ");
+      card.dataset.searchText = `${subject.name} ${subject.pills.join(" ")} ${aliasText}`.toLowerCase();
+
+      const header = document.createElement("div");
+      header.className = "subject-card-header";
+      const icon = document.createElement("span");
+      icon.className = "subject-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = subject.icon;
+      const name = document.createElement("h3");
+      name.className = "subject-name";
+      name.textContent = subject.name;
+      header.append(icon, name);
+
+      const pillsWrap = document.createElement("div");
+      pillsWrap.className = "subject-pills";
+      subject.pills.forEach((pillText) => {
+        const pill = document.createElement("span");
+        pill.className = "subject-pill";
+        pill.textContent = pillText;
+        pillsWrap.append(pill);
+      });
+
+      const reviseButton = document.createElement("button");
+      reviseButton.type = "button";
+      reviseButton.className = "subject-revise-button";
+      reviseButton.textContent = "Voir";
+      reviseButton.addEventListener("click", () => openSubjectModal(subject));
+
+      card.append(header, pillsWrap, reviseButton);
+      subjectsGrid.append(card);
+    });
+
+    function filterSubjectCards() {
+      const query = subjectSearch.value.trim().toLowerCase();
+      let visibleCount = 0;
+      [...subjectsGrid.children].forEach((card) => {
+        const matches = !query || card.dataset.searchText.includes(query);
+        card.hidden = !matches;
+        if (matches) visibleCount += 1;
+      });
+      subjectsEmpty.hidden = visibleCount !== 0;
+    }
+
+    subjectSearch.addEventListener("input", filterSubjectCards);
+
     document.getElementById("enter-button").addEventListener("click", () => {
       homeView.hidden = true;
+      insideView.hidden = false;
+    });
+
+    document.getElementById("subjects-button").addEventListener("click", () => {
+      insideView.hidden = true;
+      subjectsView.hidden = false;
+    });
+
+    document.getElementById("subjects-back-button").addEventListener("click", () => {
+      subjectsView.hidden = true;
       insideView.hidden = false;
     });
 
@@ -1083,6 +1560,7 @@ function savePage(pageNumber) {
         adminError.hidden = true;
         homeView.hidden = true;
         insideView.hidden = true;
+        subjectsView.hidden = true;
         adminView.hidden = false;
         siteFooter.hidden = true;
       } else {
@@ -1122,6 +1600,7 @@ function savePage(pageNumber) {
     document.getElementById("admin-back-button").addEventListener("click", () => {
       adminView.hidden = true;
       insideView.hidden = true;
+      subjectsView.hidden = true;
       homeView.hidden = false;
       siteFooter.hidden = false;
     });
